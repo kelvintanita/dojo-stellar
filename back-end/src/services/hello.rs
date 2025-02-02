@@ -1,4 +1,4 @@
-use crate::models::hellomodel::HelloForm;
+use crate::models::hello::HelloForm;
 use actix_multipart::form::MultipartForm;
 use actix_web::{post, Responder};
 

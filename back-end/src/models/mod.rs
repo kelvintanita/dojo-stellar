@@ -1,2 +1,2 @@
-pub mod hellomodel;
+pub mod hello;
 pub mod user;
