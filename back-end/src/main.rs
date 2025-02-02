@@ -17,9 +17,8 @@ use crate::services::stellar::{get_balance, get_block, get_transaction};
 #[actix_web::main]
 async fn main() -> io::Result<()> {
     env_logger::init();
-    info!("========= Servidor iniciado na porta 8080 =========");
+    info!("========= Servidor iniciado na porta 8080 | http://127.0.0.1:8080 =========");
     dotenv().ok();
-
     HttpServer::new(|| {
         App::new()
             .service(get_block)
