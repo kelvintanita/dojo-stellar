@@ -1,0 +1,16 @@
+[package]
+name = "back-end"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+actix-web = "4"
+actix-multipart = "0.7"
+utoipa = { version = "5", features = ["actix_extras"] }
+utoipa-swagger-ui = { version = "8", features = ["actix-web"] }
+utoipa-actix-web = "0.1"
+env_logger = "0.10"  # Adicione esta linha
+log = "0.4"          # Necessária para integração de logs
+serde = { version = "1.0", features = ["derive"] }
+
+[workspace]
