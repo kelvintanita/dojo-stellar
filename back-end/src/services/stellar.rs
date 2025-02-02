@@ -1,108 +1,86 @@
 use actix_web::{get, web, Responder, HttpResponse};
 use reqwest::Client;
 use std::env;
-use crate::models::stellar::{Account, Transaction, Offer, Ledger};
+use log::{error, warn};
+
+use crate::models::stellar::{Account, Ledger, Transaction};
 
 async fn get_base_url() -> String {
     env::var("RPC_URL").unwrap_or_else(|_| "http://34.60.10.29:8000".to_string())
 }
 
-/// Obtém os detalhes de uma conta na Stellar
+/// Buscar um bloco pelo número
 #[utoipa::path(
     get,
-    path = "/accounts/{account_id}",
-    params(
-        ("account_id" = String, Path, description = "ID da conta Stellar")
-    ),
-    responses(
-        (status = 200, description = "Conta retornada com sucesso", body = Account)
-    )
+    path = "/block/{sequence}",
+    params(("sequence" = u32, Path, description = "Número do bloco")),
+    responses((status = 200, description = "Bloco retornado com sucesso", body = Ledger))
 )]
-#[get("/accounts/{account_id}")]
-async fn get_account(account_id: web::Path<String>) -> impl Responder {
+#[get("/block/{sequence}")]
+async fn get_block(sequence: web::Path<u32>) -> impl Responder {
+    fetch_data::<Ledger>(&format!("ledgers/{}", sequence.into_inner())).await
+}
+
+/// Buscar uma transação pelo hash
+#[utoipa::path(
+    get,
+    path = "/transaction/{hash}",
+    params(("hash" = String, Path, description = "Hash da transação")),
+    responses((status = 200, description = "Transação retornada com sucesso", body = Transaction))
+)]
+#[get("/transaction/{hash}")]
+async fn get_transaction(hash: web::Path<String>) -> impl Responder {
+    fetch_data::<Transaction>(&format!("transactions/{}", hash.into_inner())).await
+}
+
+/// Buscar o saldo pelo endereço
+#[utoipa::path(
+    get,
+    path = "/balance/{account_id}",
+    params(("account_id" = String, Path, description = "Endereço da conta Stellar")),
+    responses((status = 200, description = "Saldo retornado com sucesso", body = Vec<Account>))
+)]
+#[get("/balance/{account_id}")]
+async fn get_balance(account_id: web::Path<String>) -> impl Responder {
+    fetch_data::<Account>(&format!("accounts/{}", account_id.into_inner())).await
+}
+
+/// Função genérica para buscar dados da API
+async fn fetch_data<T: serde::de::DeserializeOwned + serde::Serialize>(endpoint: &str) -> impl Responder {
     let client = Client::new();
-    let url = format!("{}/accounts/{}", get_base_url().await, account_id.into_inner());
+    let base_url = get_base_url().await;
+    let url = format!("{}/{}", base_url, endpoint);
 
     match client.get(&url).send().await {
-        Ok(response) => match response.json::<Account>().await {
-            Ok(account) => HttpResponse::Ok().json(account),
-            Err(_) => HttpResponse::InternalServerError().body("Erro ao deserializar a resposta."),
-        },
-        Err(_) => HttpResponse::InternalServerError().body("Erro ao acessar a API da Stellar."),
+        Ok(response) => {
+            let status = response.status();
+            
+            if status == reqwest::StatusCode::NOT_FOUND {
+                warn!("Recurso não encontrado: {}", url);
+                return HttpResponse::NotFound().body("Recurso não encontrado.");
+            }
+
+            if status.is_success() {
+                match response.json::<T>().await {
+                    Ok(data) => HttpResponse::Ok().json(data),
+                    Err(err) => {
+                        error!("Erro ao deserializar a resposta de {}: {}", url, err);
+                        HttpResponse::InternalServerError().body("Erro ao deserializar a resposta.")
+                    }
+                }
+            } else {
+                error!("Erro na resposta da API para {}: {:?}", url, status);
+                HttpResponse::InternalServerError().body("Erro ao acessar a API da Stellar.")
+            }
+        }
+        Err(err) => {
+            error!("Erro ao conectar-se à API: {}", err);
+            if err.is_connect() {
+                HttpResponse::ServiceUnavailable().body("Erro de conexão com a API da Stellar.")
+            } else {
+                HttpResponse::InternalServerError().body("Erro inesperado ao acessar a API da Stellar.")
+            }
+        }
     }
 }
 
-/// Obtém as transações de uma conta
-#[utoipa::path(
-    get,
-    path = "/accounts/{account_id}/transactions",
-    params(
-        ("account_id" = String, Path, description = "ID da conta Stellar")
-    ),
-    responses(
-        (status = 200, description = "Transações retornadas com sucesso", body = Vec<Transaction>)
-    )
-)]
-#[get("/accounts/{account_id}/transactions")]
-async fn get_account_transactions(account_id: web::Path<String>) -> impl Responder {
-    let client = Client::new();
-    let url = format!("{}/accounts/{}/transactions", get_base_url().await, account_id.into_inner());
-
-    match client.get(&url).send().await {
-        Ok(response) => match response.json::<Vec<Transaction>>().await {
-            Ok(transactions) => HttpResponse::Ok().json(transactions),
-            Err(_) => HttpResponse::InternalServerError().body("Erro ao deserializar transações."),
-        },
-        Err(_) => HttpResponse::InternalServerError().body("Erro ao acessar a API da Stellar."),
-    }
-}
-
-/// Obtém detalhes de uma oferta
-#[utoipa::path(
-    get,
-    path = "/offers/{offer_id}",
-    params(
-        ("offer_id" = String, Path, description = "ID da oferta")
-    ),
-    responses(
-        (status = 200, description = "Oferta retornada com sucesso", body = Offer)
-    )
-)]
-#[get("/offers/{offer_id}")]
-async fn get_offer(offer_id: web::Path<String>) -> impl Responder {
-    let client = Client::new();
-    let url = format!("{}/offers/{}", get_base_url().await, offer_id.into_inner());
-
-    match client.get(&url).send().await {
-        Ok(response) => match response.json::<Offer>().await {
-            Ok(offer) => HttpResponse::Ok().json(offer),
-            Err(_) => HttpResponse::InternalServerError().body("Erro ao deserializar a oferta."),
-        },
-        Err(_) => HttpResponse::InternalServerError().body("Erro ao acessar a API da Stellar."),
-    }
-}
-
-/// Obtém informações de um ledger
-#[utoipa::path(
-    get,
-    path = "/ledgers/{sequence}",
-    params(
-        ("sequence" = u32, Path, description = "Número do ledger")
-    ),
-    responses(
-        (status = 200, description = "Ledger retornado com sucesso", body = Ledger)
-    )
-)]
-#[get("/ledgers/{sequence}")]
-async fn get_ledger(sequence: web::Path<u32>) -> impl Responder {
-    let client = Client::new();
-    let url = format!("{}/ledgers/{}", get_base_url().await, sequence.into_inner());
-
-    match client.get(&url).send().await {
-        Ok(response) => match response.json::<Ledger>().await {
-            Ok(ledger) => HttpResponse::Ok().json(ledger),
-            Err(_) => HttpResponse::InternalServerError().body("Erro ao deserializar o ledger."),
-        },
-        Err(_) => HttpResponse::InternalServerError().body("Erro ao acessar a API da Stellar."),
-    }
-}
