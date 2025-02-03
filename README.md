@@ -16,6 +16,7 @@ Certifique-se de ter os seguintes requisitos instalados antes de rodar o projeto
    ```sh
    git clone https://github.com/kelvintanita/dojo-stellar.git
    cd dojo-stellar
+   cd back-end
    ```
 
 2. Instale as dependências do projeto:
@@ -35,7 +36,7 @@ Para iniciar o servidor de desenvolvimento, execute:
 cargo run
 ```
 
-O servidor estará rodando em `http://127.0.0.1:8080/`.
+O servidor estará rodando em `http://localhost.:8080/`.
 
 ## Endpoints Principais
 
@@ -51,7 +52,7 @@ O servidor estará rodando em `http://127.0.0.1:8080/`.
 
 Após iniciar o servidor com `cargo run`, a documentação Swagger estará disponível no seguinte endereço:
 ```
-http://127.0.0.1:8080/swagger-ui/#/
+http://localhost.:8080/swagger-ui/#
 ```
 
 Acesse esse link no navegador para explorar os endpoints disponíveis e testar requisições diretamente pela interface do Swagger.
