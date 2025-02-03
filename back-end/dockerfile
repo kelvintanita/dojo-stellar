@@ -1,7 +1,7 @@
 # Etapa 1: Build da aplicação
 FROM rust:1.75 as builder
 
-# Atualizar Cargo antes de compilar
+# Atualizar Rust e Cargo
 RUN rustup update stable && rustup default stable
 
 # Definir diretório de trabalho
@@ -13,3 +13,21 @@ COPY src ./src
 
 # Compilar a aplicação
 RUN cargo build --release
+
+# Etapa 2: Imagem final mínima
+FROM gcr.io/distroless/cc
+
+# Definir diretório de trabalho
+WORKDIR /app
+
+# Copiar binário da aplicação
+COPY --from=builder /app/target/release/back-end .
+
+# Expor a porta definida pela variável `PORT`
+ENV PORT=8080
+EXPOSE 8080
+
+# Iniciar a aplicação e garantir que usa a porta correta
+#CMD ["sh", "-c", "./back-end --port $PORT"]
+CMD ["./back-end"]
+

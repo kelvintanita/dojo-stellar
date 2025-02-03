@@ -1,5 +1,5 @@
 use std::io;
-
+use std::env;
 use actix_web::{App, HttpServer};
 use utoipa::OpenApi;
 use utoipa_swagger_ui::SwaggerUi;
@@ -17,8 +17,13 @@ use crate::services::stellar::{get_balance, get_block, get_transaction};
 #[actix_web::main]
 async fn main() -> io::Result<()> {
     env_logger::init();
-    info!("========= Servidor iniciado na porta 8080 | http://127.0.0.1:8080 =========");
     dotenv().ok();
+
+    let port = env::var("PORT").unwrap_or_else(|_| "8080".to_string());  // Lendo porta do ambiente
+    let port: u16 = port.parse().expect("PORT inválida");
+
+    info!("Servidor iniciando na porta {}", port);
+    
     HttpServer::new(|| {
         App::new()
             .service(get_block)
@@ -28,7 +33,7 @@ async fn main() -> io::Result<()> {
                 SwaggerUi::new("/swagger-ui/{_:.*}").url("/api/openapi.json", ApiDoc::openapi()), 
             )
     })
-    .bind(("127.0.0.1", 8080))?
+    .bind(("0.0.0.0", port))?
     .run()
     .await
 }
