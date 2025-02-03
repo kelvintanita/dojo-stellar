@@ -8,7 +8,7 @@ RUN rustup update stable && rustup default stable
 WORKDIR /app
 
 # Copiar arquivos do projeto
-COPY Cargo.toml Cargo.lock ./
+COPY Cargo.toml ./
 COPY src ./src
 
 # Compilar a aplicação
