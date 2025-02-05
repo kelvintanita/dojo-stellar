@@ -1,10 +1,9 @@
-// src/pages/BalancePage.tsx
 import React, { useState } from 'react';
 import { fetchBalance } from '../services/api';
 
 const BalancePage: React.FC = () => {
   const [address, setAddress] = useState<string>('');
-  const [saldo, setSaldo] = useState<number | null>(null); 
+  const [saldo, setSaldo] = useState<number | null>(null);
   const [error, setError] = useState<string>('');
 
   const handleFetchBalance = async () => {
@@ -12,12 +11,18 @@ const BalancePage: React.FC = () => {
       setError('');
       setSaldo(null);
       const data = await fetchBalance(address);
-      setSaldo(data.balances[0].balance); 
-      console.log(data);
-      
+      // Ajuste conforme a estrutura do retorno. Exemplo:
+      setSaldo(data.balances[0].balance);
     } catch (err: any) {
       setError(err.message);
     }
+  };
+
+  // Função para limpar o input e o resultado
+  const handleClear = () => {
+    setAddress('');
+    setSaldo(null);
+    setError('');
   };
 
   return (
@@ -53,11 +58,25 @@ const BalancePage: React.FC = () => {
         >
           Buscar
         </button>
+
+        {/* Botão "Limpar" */}
+        <button
+          onClick={handleClear}
+          style={{
+            backgroundColor: '#555',
+            color: '#fff',
+            padding: '0.5rem 1rem',
+            border: 'none',
+            borderRadius: '8px',
+            cursor: 'pointer',
+          }}
+        >
+          Limpar
+        </button>
       </div>
 
       {error && <p style={{ color: 'red', marginTop: '1rem' }}>{error}</p>}
 
-      {/* Exibe o valor do saldo, caso exista */}
       {saldo !== null && (
         <div style={{ marginTop: '1rem' }}>
           <h3 style={{ color: '#fff' }}>Saldo: {saldo}</h3>

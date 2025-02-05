@@ -1,4 +1,3 @@
-// src/pages/TransactionPage.tsx
 import React, { useState } from 'react';
 import { fetchTransaction } from '../services/api';
 
@@ -21,11 +20,16 @@ const TransactionPage: React.FC = () => {
       setError('');
       setTxData(null);
       const data = await fetchTransaction(txHash);
-      // Ajuste este parse se o retorno for diferente do que está no JSON de exemplo
       setTxData(data);
     } catch (err: any) {
       setError(err.message);
     }
+  };
+
+  const handleClear = () => {
+    setTxHash('');
+    setTxData(null);
+    setError('');
   };
 
   return (
@@ -61,6 +65,20 @@ const TransactionPage: React.FC = () => {
         >
           Buscar
         </button>
+
+        <button
+          onClick={handleClear}
+          style={{
+            backgroundColor: '#555',
+            color: '#fff',
+            padding: '0.5rem 1rem',
+            border: 'none',
+            borderRadius: '8px',
+            cursor: 'pointer',
+          }}
+        >
+          Limpar
+        </button>
       </div>
 
       {error && <p style={{ color: 'red', marginTop: '1rem' }}>{error}</p>}
@@ -68,8 +86,6 @@ const TransactionPage: React.FC = () => {
       {txData && (
         <div style={{ marginTop: '1rem' }}>
           <h3 style={{ color: '#fff' }}>Resultado da Transação:</h3>
-
-          {/* Exibe cada campo em um bloco, com label e valor */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
             <div>
               <strong>ID:</strong> {txData.id}

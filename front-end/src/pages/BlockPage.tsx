@@ -1,4 +1,3 @@
-// src/pages/BlockPage.tsx
 import React, { useState } from 'react';
 import { fetchBlock } from '../services/api';
 
@@ -32,12 +31,16 @@ const BlockPage: React.FC = () => {
       setError('');
       setBlockData(null);
       const data = await fetchBlock(Number(blockNumber));
-
-      // Ajuste se o JSON retornado tiver nomes/propriedades diferentes
       setBlockData(data);
     } catch (err: any) {
       setError(err.message);
     }
+  };
+
+  const handleClear = () => {
+    setBlockNumber('');
+    setBlockData(null);
+    setError('');
   };
 
   return (
@@ -73,6 +76,20 @@ const BlockPage: React.FC = () => {
         >
           Buscar
         </button>
+
+        <button
+          onClick={handleClear}
+          style={{
+            backgroundColor: '#555',
+            color: '#fff',
+            padding: '0.5rem 1rem',
+            border: 'none',
+            borderRadius: '8px',
+            cursor: 'pointer',
+          }}
+        >
+          Limpar
+        </button>
       </div>
 
       {error && <p style={{ color: 'red', marginTop: '1rem' }}>{error}</p>}
@@ -80,7 +97,6 @@ const BlockPage: React.FC = () => {
       {blockData && (
         <div style={{ marginTop: '1rem' }}>
           <h3 style={{ color: '#fff' }}>Dados do Bloco:</h3>
-
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
             <div>
               <strong>ID:</strong> {blockData.id}
@@ -102,7 +118,8 @@ const BlockPage: React.FC = () => {
               {blockData.successful_transaction_count}
             </div>
             <div>
-              <strong>Failed TX Count:</strong> {blockData.failed_transaction_count}
+              <strong>Failed TX Count:</strong>{' '}
+              {blockData.failed_transaction_count}
             </div>
             <div>
               <strong>Operation Count:</strong> {blockData.operation_count}
@@ -121,7 +138,8 @@ const BlockPage: React.FC = () => {
               <strong>Fee Pool:</strong> {blockData.fee_pool}
             </div>
             <div>
-              <strong>Base Fee (stroops):</strong> {blockData.base_fee_in_stroops}
+              <strong>Base Fee (stroops):</strong>{' '}
+              {blockData.base_fee_in_stroops}
             </div>
             <div>
               <strong>Base Reserve (stroops):</strong>{' '}
