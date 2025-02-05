@@ -57,8 +57,6 @@ http://localhost.:8080/swagger-ui/#
 
 Acesse esse link no navegador para explorar os endpoints disponíveis e testar requisições diretamente pela interface do Swagger.
 
-## Considerações
-Este projeto foi desenvolvido para estudos e pode ser expandido conforme necessário para atender novas funcionalidades. Contribuições são bem-vindas!
 
 ---
 
@@ -231,6 +229,11 @@ export default defineConfig({
 3. **Testes**: adicionar Jest + Testing Library para cobrir componentes e funcionalidades.
 4. **Rotas Separadas** (opcional): caso deseje acesso direto via URL `/block`, `/transaction`, `/balance`, utilize o React Router e defina `<Routes>` no `App.tsx`.
 5. **Responsividade Avançada**: incluir media queries ou breakpoints customizados para melhorar a experiência em telas menores.
+
+---
+
+## Considerações
+Este projeto foi desenvolvido para estudos e pode ser expandido conforme necessário para atender novas funcionalidades. Contribuições são bem-vindas!
 
 ---
 
