@@ -4,15 +4,17 @@ import { fetchBalance } from '../services/api';
 
 const BalancePage: React.FC = () => {
   const [address, setAddress] = useState<string>('');
-  const [balanceData, setBalanceData] = useState<any>(null);
+  const [saldo, setSaldo] = useState<number | null>(null); 
   const [error, setError] = useState<string>('');
 
   const handleFetchBalance = async () => {
     try {
       setError('');
-      setBalanceData(null);
+      setSaldo(null);
       const data = await fetchBalance(address);
-      setBalanceData(data);
+      setSaldo(data.balances[0].balance); 
+      console.log(data);
+      
     } catch (err: any) {
       setError(err.message);
     }
@@ -21,6 +23,7 @@ const BalancePage: React.FC = () => {
   return (
     <div style={{ color: '#ccc' }}>
       <h2 style={{ color: '#fff' }}>Buscar Saldo por Endereço</h2>
+
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
         <input
           type="text"
@@ -28,12 +31,12 @@ const BalancePage: React.FC = () => {
           value={address}
           onChange={(e) => setAddress(e.target.value)}
           style={{
-            width: '600px',        // Largura maior para facilitar a leitura
-            height: '2rem',        // Altura razoável
-            borderRadius: '8px',   // Cantos arredondados
-            backgroundColor: '#fff', 
+            width: '600px',
+            height: '2rem',
+            borderRadius: '8px',
+            backgroundColor: '#fff',
             color: '#333',
-            padding: '0.5rem',     // Espaçamento interno
+            padding: '0.5rem',
             border: '1px solid #999',
           }}
         />
@@ -44,7 +47,7 @@ const BalancePage: React.FC = () => {
             color: '#fff',
             padding: '0.5rem 1rem',
             border: 'none',
-            borderRadius: '8px', // Cantos arredondados do botão
+            borderRadius: '8px',
             cursor: 'pointer',
           }}
         >
@@ -53,12 +56,11 @@ const BalancePage: React.FC = () => {
       </div>
 
       {error && <p style={{ color: 'red', marginTop: '1rem' }}>{error}</p>}
-      {balanceData && (
+
+      {/* Exibe o valor do saldo, caso exista */}
+      {saldo !== null && (
         <div style={{ marginTop: '1rem' }}>
-          <h3 style={{ color: '#fff' }}>Saldo:</h3>
-          <pre style={{ color: '#fff', backgroundColor: '#444', padding: '1rem' }}>
-            {JSON.stringify(balanceData, null, 2)}
-          </pre>
+          <h3 style={{ color: '#fff' }}>Saldo: {saldo}</h3>
         </div>
       )}
     </div>
