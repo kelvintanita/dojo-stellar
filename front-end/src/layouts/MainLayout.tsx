@@ -25,6 +25,9 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         }}
       >
         <h1 style={{ margin: 0 }}>Stellar Explorador de Blocos</h1>
+        <p style={{ margin: '1rem 0' }}>
+        Nesta página, você pode buscar Blocos, Transações e Saldos em um só lugar.
+      </p>
       </header>
 
       <main
