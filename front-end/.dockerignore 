@@ -5,3 +5,14 @@ Dockerfile
 .git
 .gitignore
 README.md
+dist
+.vscode
+.idea
+*.log
+*.env
+*.env.local
+.DS_Store
+.git
+.gitignore
+*.tmp
+*.swp
