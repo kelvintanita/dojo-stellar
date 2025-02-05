@@ -132,7 +132,7 @@ front-end
 ├─ tsconfig.json
 ├─ package.json
 ├─ vite.config.ts
-└─ README.md                  # Você está aqui!
+└─ README.md                  
 ```
 
 ### Principais Arquivos
