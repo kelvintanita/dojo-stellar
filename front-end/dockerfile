@@ -1,4 +1,4 @@
-# Etapa 1: Construção da aplicação React com Vite
+# Etapa 1: Construir a aplicação React com Vite
 FROM node:20.18.2-alpine AS builder
 WORKDIR /app
 COPY package.json package-lock.json ./
@@ -6,9 +6,10 @@ RUN npm install --frozen-lockfile
 COPY . .
 RUN npm run build
 
-# Etapa 2: Configuração do servidor Nginx para servir o build do Vite
+# Etapa 2: Servir os arquivos com Nginx
 FROM nginx:alpine
-COPY --from=builder /app/dist /usr/share/nginx/html
-COPY ./nginx.conf /etc/nginx/conf.d/default.conf
-EXPOSE 80
+COPY --from=builder /app/dist /usr/share/nginx/html 
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+EXPOSE 8080
 CMD ["nginx", "-g", "daemon off;"]
+
