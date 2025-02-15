@@ -1,13 +1,65 @@
-use actix_web::{get, web, Responder, HttpResponse};
+use actix_web::{get,post, web, Responder, HttpResponse};
 use reqwest::Client;
 use std::env;
 use log::{error, warn};
+use serde::{Serialize, Deserialize};
+use stellar_sdk::Keypair;
+use aes_gcm::{Aes128Gcm, Key, Nonce};
+use aes_gcm::aead::{Aead, KeyInit};
+use rand::Rng;
+use base64::{engine::general_purpose, Engine as _};
+use utoipa::ToSchema;
+
 
 use crate::models::stellar::{Account, Ledger, Transaction};
 
 async fn get_base_url() -> String {
     env::var("RPC_URL").unwrap_or_else(|_| "http://34.60.10.29:8000".to_string())
 }
+
+const AES_KEY: [u8; 16] = *b"0123456789abcdef"; // Correção: Agora é um array fixo, sem referência
+
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
+struct KeyPairResponse {
+    public_key: String,
+    encrypted_private_key: String,
+}
+
+#[utoipa::path(
+    post,
+    path = "/generate_keys",
+    responses((status = 200, description = "Par de chaves gerado com sucesso", body = KeyPairResponse))
+)]
+#[post("/generate_keys")]
+async fn generate_keys() -> impl Responder {
+    let mut keypair = Keypair::random().expect("Erro ao gerar chave"); // 🔥 Adicionado `mut`
+    let public_key = keypair.public_key();
+    let private_key = keypair.secret_key().expect("Erro ao obter chave privada");
+
+    // Gerando nonce aleatório (12 bytes)
+    let mut rng = rand::thread_rng();
+    let nonce_bytes: [u8; 12] = rng.gen();
+    let nonce = Nonce::from_slice(&nonce_bytes);
+
+    // 🔥 Correção: Passar `AES_KEY` corretamente como slice (`&AES_KEY`)
+    let key = Key::<Aes128Gcm>::from_slice(&AES_KEY); 
+    let cipher = Aes128Gcm::new(key);
+
+    // Criptografando a chave privada com AES-128-GCM
+    let encrypted_data = cipher.encrypt(nonce, private_key.as_bytes()).expect("Erro na criptografia");
+
+    let encrypted_private_key = format!(
+        "{}:{}",
+        general_purpose::STANDARD.encode(&nonce_bytes),
+        general_purpose::STANDARD.encode(&encrypted_data)
+    );
+
+    HttpResponse::Ok().json(KeyPairResponse {
+        public_key,
+        encrypted_private_key,
+    })
+}
+
 
 /// Buscar um bloco pelo número
 #[utoipa::path(

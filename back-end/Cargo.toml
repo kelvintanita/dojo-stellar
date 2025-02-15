@@ -15,5 +15,11 @@ serde = { version = "1.0", features = ["derive"] }
 dotenv = "0.15"
 reqwest = { version = "0.11", features = ["json"] }
 actix-cors = "0.6"
+stellar_sdk = "0.1.4"  # Versão mais recente que suporta Stellar
+aes-gcm = "0.10"       # Para criptografia AES-128-GCM
+rand = "0.8"           # Para geração de números aleatórios
+base64 = "0.21"        # Para codificação/decodificação Base64
+
+
 
 [workspace]
