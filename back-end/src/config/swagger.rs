@@ -2,6 +2,8 @@ use utoipa::OpenApi;
 use crate::services::stellar::__path_get_balance;
 use crate::services::stellar::__path_get_block;
 use crate::services::stellar::__path_get_transaction;
+use crate::services::stellar::__path_generate_keys;
+use crate::services::stellar::__path_send_xlm;
 
 #[derive(OpenApi)]
 #[openapi(
@@ -16,6 +18,6 @@ use crate::services::stellar::__path_get_transaction;
         license(name = "MIT", url = "https://opensource.org/licenses/MIT"),
         version = "1.0.0"
     ),
-    paths(get_balance, get_block, get_transaction)
+    paths(get_balance, get_block, get_transaction, generate_keys, send_xlm)
 )]
 pub struct ApiDoc;

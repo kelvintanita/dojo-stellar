@@ -13,7 +13,7 @@ mod models;
 mod services;
 
 use crate::config::swagger::ApiDoc;
-use crate::services::stellar::{get_balance, get_block, get_transaction};
+use crate::services::stellar::{get_balance, get_block, get_transaction, generate_keys, send_xlm};
 
 #[actix_web::main]
 async fn main() -> io::Result<()> {
@@ -40,6 +40,8 @@ async fn main() -> io::Result<()> {
             .service(get_block)
             .service(get_transaction)
             .service(get_balance)
+            .service(generate_keys)
+            .service(send_xlm)
             .service(
                 SwaggerUi::new("/swagger-ui/{_:.*}").url("/api/openapi.json", ApiDoc::openapi()),
             )

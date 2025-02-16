@@ -1,6 +1,14 @@
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
+
+#[derive(Debug, Deserialize, Serialize, ToSchema)]
+pub struct SendXlmRequest {
+    pub sender_secret: String,
+    pub recipient: String,
+    pub amount: String,
+}
+
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub struct KeyPairResponse {
     pub public_key: String,
