@@ -2,27 +2,18 @@ use actix_web::{get,post, web, Responder, HttpResponse};
 use reqwest::Client;
 use std::env;
 use log::{error, warn};
-use serde::{Serialize, Deserialize};
 use stellar_sdk::Keypair;
 use aes_gcm::{Aes128Gcm, Key, Nonce};
 use aes_gcm::aead::{Aead, KeyInit};
 use rand::Rng;
 use base64::{engine::general_purpose, Engine as _};
-use utoipa::ToSchema;
 
 
-use crate::models::stellar::{Account, Ledger, Transaction};
+use crate::models::stellar::{Account, Ledger, TransactionModel, KeyPairResponse};
+use crate::config::constants::{AES_KEY, HORIZON_URL};
 
 async fn get_base_url() -> String {
     env::var("RPC_URL").unwrap_or_else(|_| "http://34.60.10.29:8000".to_string())
-}
-
-const AES_KEY: [u8; 16] = *b"0123456789abcdef"; // Correção: Agora é um array fixo, sem referência
-
-#[derive(Debug, Serialize, Deserialize, ToSchema)]
-struct KeyPairResponse {
-    public_key: String,
-    encrypted_private_key: String,
 }
 
 #[utoipa::path(
@@ -78,11 +69,11 @@ async fn get_block(sequence: web::Path<u32>) -> impl Responder {
     get,
     path = "/transaction/{hash}",
     params(("hash" = String, Path, description = "Hash da transação")),
-    responses((status = 200, description = "Transação retornada com sucesso", body = Transaction))
+    responses((status = 200, description = "Transação retornada com sucesso", body = TransactionModel))
 )]
 #[get("/transaction/{hash}")]
 async fn get_transaction(hash: web::Path<String>) -> impl Responder {
-    fetch_data::<Transaction>(&format!("transactions/{}", hash.into_inner())).await
+    fetch_data::<TransactionModel>(&format!("transactions/{}", hash.into_inner())).await
 }
 
 /// Buscar o saldo pelo endereço

@@ -2,6 +2,12 @@ use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
+pub struct KeyPairResponse {
+    pub public_key: String,
+    pub encrypted_private_key: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub struct Account {
     pub id: String,
     pub sequence: String,
@@ -17,7 +23,7 @@ pub struct Balance {
 }
 
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
-pub struct Transaction {
+pub struct TransactionModel {
     pub id: String,
     pub paging_token: String,
     pub successful: bool,
