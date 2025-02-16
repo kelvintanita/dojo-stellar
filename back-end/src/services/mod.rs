@@ -1,3 +1,2 @@
-pub mod hello;
-pub mod user;
-pub mod stellar;
+pub mod stellar_service;
+//pub mod oracle;

@@ -1,9 +1,9 @@
 use utoipa::OpenApi;
-use crate::services::stellar::__path_get_balance;
-use crate::services::stellar::__path_get_block;
-use crate::services::stellar::__path_get_transaction;
-use crate::services::stellar::__path_generate_keys;
-use crate::services::stellar::__path_send_xlm;
+use crate::services::stellar_service::__path_get_balance;
+use crate::services::stellar_service::__path_get_block;
+use crate::services::stellar_service::__path_get_transaction;
+use crate::services::stellar_service::__path_generate_keys;
+use crate::services::stellar_service::__path_send_xlm;
 
 #[derive(OpenApi)]
 #[openapi(

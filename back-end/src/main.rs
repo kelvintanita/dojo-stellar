@@ -13,7 +13,7 @@ mod models;
 mod services;
 
 use crate::config::swagger::ApiDoc;
-use crate::services::stellar::{get_balance, get_block, get_transaction, generate_keys, send_xlm};
+use crate::services::stellar_service::{get_balance, get_block, get_transaction, generate_keys, send_xlm};
 
 #[actix_web::main]
 async fn main() -> io::Result<()> {

@@ -1,6 +1,6 @@
 use crate::config::constants::{AES_KEY, HORIZON_URL};
-use crate::models::stellar::{Account, KeyPairResponse, Ledger, TransactionModel, SendXlmRequest};
-use crate::config::utils::{ get_base_url };
+use crate::models::stellar_model::{Account, KeyPairResponse, Ledger, TransactionModel, SendXlmRequest};
+use crate::config::utils::get_base_url;
 use actix_web::{get, post, web, HttpResponse, Responder};
 use aes_gcm::aead::{Aead, KeyInit};
 use aes_gcm::{Aes128Gcm, Key, Nonce};
